@@ -1,0 +1,63 @@
+{
+    TES3: {
+        subrecords: {
+            FORM: {
+                data: [
+                    {
+                        type: "int",
+                        name: "format",
+                        enum: {
+                            0: "esp",
+                            1: "esm"
+                        }
+                    }
+                ]
+            },
+            HEDR: {
+                data: [
+                    {
+                        type: "float",
+                        name: "version"
+                    },
+                    {
+                        type: "int",
+                        name: "type"
+                    },
+                    {
+                        type: "string",
+                        length: 32,
+                        name: "author"
+                    },
+                    {
+                        type: "description",
+                        length: 256,
+                        name: "author"
+                    },
+                    {
+                        type: "int",
+                        name: "records"
+                    }
+                ]
+            },
+            MAST: {
+                data: [
+                    {
+                        type: "string",
+                        name: "name"
+                    }
+                ]
+            },
+            DATA: {
+                data: [
+                    {
+                        type: "long",
+                        name: "length"
+                    }
+                ]
+            }
+        },
+        ouput: {
+            
+        }
+    }
+}
