@@ -10,7 +10,7 @@ import java.nio.charset.StandardCharsets;
 
 import org.tamrielrebuilt.esm2yaml.esm.CloseableRecordListener;
 import org.tamrielrebuilt.esm2yaml.esm.EsmInputStream;
-import org.tamrielrebuilt.esm2yaml.esm.Record;
+import org.tamrielrebuilt.esm2yaml.esm.RecordUtil;
 import org.tamrielrebuilt.esm2yaml.esm.jackson.JsonLockWriter;
 import org.tamrielrebuilt.esm2yaml.io.HexInputStream;
 
@@ -28,10 +28,10 @@ public class ScriptWriterFactory extends AbstractRecordListenerFactory {
 	}
 
 	private static class Listener implements CloseableRecordListener {
-		private static final int HEADER = Record.getValue("SCHD");
-		private static final int VARIABLES = Record.getValue("SCVR");
-		private static final int BYTECODE = Record.getValue("SCDT");
-		private static final int SOURCE = Record.getValue("SCTX");
+		private static final int HEADER = RecordUtil.getValue("SCHD");
+		private static final int VARIABLES = RecordUtil.getValue("SCVR");
+		private static final int BYTECODE = RecordUtil.getValue("SCDT");
+		private static final int SOURCE = RecordUtil.getValue("SCTX");
 		private final LockFileWriter lock;
 		private final File baseDir;
 		private final JsonFactory factory;
@@ -106,10 +106,10 @@ public class ScriptWriterFactory extends AbstractRecordListenerFactory {
 						reader.transferTo(writer);
 					}
 				}
-			} else if(type == Record.DELETED) {
+			} else if(type == RecordUtil.DELETED) {
 				generator.writeBooleanField("deleted", true);
 			} else {
-				generator.writeStringField(Record.toString(type), input.readAll());
+				generator.writeStringField(RecordUtil.toString(type), input.readAll());
 			}
 		}
 

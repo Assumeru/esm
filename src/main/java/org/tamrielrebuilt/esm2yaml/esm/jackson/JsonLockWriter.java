@@ -6,7 +6,7 @@ import java.io.IOException;
 
 import org.tamrielrebuilt.esm2yaml.esm.CloseableRecordListener;
 import org.tamrielrebuilt.esm2yaml.esm.EsmInputStream;
-import org.tamrielrebuilt.esm2yaml.esm.Record;
+import org.tamrielrebuilt.esm2yaml.esm.RecordUtil;
 import org.tamrielrebuilt.esm2yaml.esm.records.LockFileWriter;
 
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -56,7 +56,7 @@ public class JsonLockWriter implements CloseableRecordListener, LockFileWriter {
 		generator.writeStartObject();
 		recordOpen = true;
 		stringBuffer.setLength(0);
-		Record.appendTo(stringBuffer, type);
+		RecordUtil.appendTo(stringBuffer, type);
 		generator.writeStringField("type", stringBuffer.toString());
 		writeRecord(generator, flags, unknown);
 		generator.writeArrayFieldStart("subrecords");
@@ -67,7 +67,7 @@ public class JsonLockWriter implements CloseableRecordListener, LockFileWriter {
 	public void onSubrecord(int type, EsmInputStream input) throws IOException {
 		generator.writeStartObject();
 		stringBuffer.setLength(0);
-		Record.appendTo(stringBuffer, type);
+		RecordUtil.appendTo(stringBuffer, type);
 		generator.writeStringField("type", stringBuffer.toString());
 		generator.writeStringField("data", input.readAll(byteBuffer, buffer));
 		generator.writeEndObject();

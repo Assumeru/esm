@@ -4,10 +4,10 @@ import java.io.IOException;
 
 import org.tamrielrebuilt.esm2yaml.Util;
 
-public final class Record {
+public final class RecordUtil {
 	public static final int DELETED = getValue("DELE");
 
-	private Record() {}
+	private RecordUtil() {}
 
 	public static <A extends Appendable> A appendTo(A appendable, int value) {
 		try {

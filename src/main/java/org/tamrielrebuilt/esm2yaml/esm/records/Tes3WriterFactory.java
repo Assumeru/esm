@@ -5,7 +5,7 @@ import java.io.IOException;
 
 import org.tamrielrebuilt.esm2yaml.esm.CloseableRecordListener;
 import org.tamrielrebuilt.esm2yaml.esm.EsmInputStream;
-import org.tamrielrebuilt.esm2yaml.esm.Record;
+import org.tamrielrebuilt.esm2yaml.esm.RecordUtil;
 import org.tamrielrebuilt.esm2yaml.esm.jackson.JsonLockWriter;
 
 import com.fasterxml.jackson.core.JsonEncoding;
@@ -24,10 +24,10 @@ public class Tes3WriterFactory extends AbstractRecordListenerFactory {
 	}
 
 	private static class Listener implements CloseableRecordListener {
-		private static final int FORMAT = Record.getValue("FORM");
-		private static final int HEADER = Record.getValue("HEDR");
-		private static final int MASTER = Record.getValue("MAST");
-		private static final int LENGTH = Record.getValue("DATA");
+		private static final int FORMAT = RecordUtil.getValue("FORM");
+		private static final int HEADER = RecordUtil.getValue("HEDR");
+		private static final int MASTER = RecordUtil.getValue("MAST");
+		private static final int LENGTH = RecordUtil.getValue("DATA");
 		private final LockFileWriter writer;
 		private final File file;
 		private final JsonFactory factory;
@@ -75,7 +75,7 @@ public class Tes3WriterFactory extends AbstractRecordListenerFactory {
 			} else if(type == LENGTH) {
 				System.out.println(input.readLELong());
 			} else {
-				generator.writeStringField(Record.toString(type), input.readAll());
+				generator.writeStringField(RecordUtil.toString(type), input.readAll());
 			}
 		}
 

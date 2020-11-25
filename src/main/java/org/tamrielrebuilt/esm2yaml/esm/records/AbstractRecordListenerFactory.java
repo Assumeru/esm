@@ -1,6 +1,6 @@
 package org.tamrielrebuilt.esm2yaml.esm.records;
 
-import org.tamrielrebuilt.esm2yaml.esm.Record;
+import org.tamrielrebuilt.esm2yaml.esm.RecordUtil;
 
 public abstract class AbstractRecordListenerFactory implements RecordListenerFactory {
 	protected final int type;
@@ -10,7 +10,7 @@ public abstract class AbstractRecordListenerFactory implements RecordListenerFac
 	}
 
 	public AbstractRecordListenerFactory(CharSequence type) {
-		this(Record.getValue(type));
+		this(RecordUtil.getValue(type));
 	}
 
 	@Override

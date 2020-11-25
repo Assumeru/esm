@@ -3,25 +3,37 @@ package org.tamrielrebuilt.esm2yaml;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.function.Function;
 
 import org.tamrielrebuilt.esm2yaml.esm.EsmInputStream;
 import org.tamrielrebuilt.esm2yaml.esm.EsmReader;
 import org.tamrielrebuilt.esm2yaml.esm.RecordListener;
-import org.tamrielrebuilt.esm2yaml.esm.jackson.JsonEsmWriter;
+import org.tamrielrebuilt.esm2yaml.schema.Context;
+import org.tamrielrebuilt.esm2yaml.schema.SchemaParser;
 
 public class Esm2Yaml {
 	public static void main(String[] args) throws IOException {
-		String dataFiles = "F:\\Program Files (x86)\\Morrowind\\Data Files";
-		File file = new File(dataFiles, "HB_Dark_Guars_V11.ESP");
-//		File file = new File(dataFiles, "0PC_shrinetest.ESP");
-		File directory = new File("C:\\Users\\EE\\Desktop\\test\\src");
+		Function<Context, RecordListener> builder = SchemaParser.getBuilder();
+		RecordListener listener = builder.apply(new Context());
+		
+		
 		
 
-		try(JsonEsmWriter writer = new YamlWriter(directory)) {
-			try(EsmReader reader = new EsmReader(file, StandardCharsets.ISO_8859_1)) {
-				reader.read(writer);
-			}
+		String dataFiles = "F:\\Program Files (x86)\\Morrowind\\Data Files";
+//		File file = new File(dataFiles, "HB_Dark_Guars_V11.ESP");
+		File file = new File(dataFiles, "0PC_shrinetest.ESP");
+		File directory = new File("C:\\Users\\EE\\Desktop\\test\\src");
+		
+		try(EsmReader reader = new EsmReader(file, StandardCharsets.ISO_8859_1)) {
+			reader.read(listener);
 		}
+		
+
+//		try(JsonEsmWriter writer = new YamlWriter(directory)) {
+//			try(EsmReader reader = new EsmReader(file, StandardCharsets.ISO_8859_1)) {
+//				reader.read(writer);
+//			}
+//		}
 //		Counter c = new Counter();
 //		for(File f : new File(dataFiles).listFiles(f -> f.getName().toLowerCase().endsWith(".esp"))) {
 //			try(EsmReader reader = new EsmReader(f, StandardCharsets.ISO_8859_1)) {

@@ -50,7 +50,7 @@ public class EsmReader implements Closeable {
 		EsmInputStream subrecord = new EsmInputStream(new InputStreamView(input, size), input.getCharset());
 		listener.onSubrecord(type, subrecord);
 		if(subrecord.available() > 0) {
-			throw new IllegalStateException(Record.appendTo(new StringBuilder("Failed to read complete subrecord "), type).toString());
+			throw new IllegalStateException(RecordUtil.appendTo(new StringBuilder("Failed to read complete subrecord "), type).toString());
 		}
 	}
 

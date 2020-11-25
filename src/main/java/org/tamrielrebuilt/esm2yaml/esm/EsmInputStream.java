@@ -125,7 +125,7 @@ public class EsmInputStream extends InputStream {
 			throw new IOException("Failed to read string");
 		}
 		int pos = 0;
-		while(buffer[pos] != 0 && pos < length) {
+		while(pos < length && buffer[pos] != 0) {
 			pos++;
 		}
 		return new String(buffer, 0, pos, charset);

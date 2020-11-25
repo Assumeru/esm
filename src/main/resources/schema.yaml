@@ -1,63 +1,72 @@
-{
-    TES3: {
-        subrecords: {
-            FORM: {
-                data: [
-                    {
-                        type: "int",
-                        name: "format",
-                        enum: {
-                            0: "esp",
-                            1: "esm"
-                        }
-                    }
-                ]
-            },
-            HEDR: {
-                data: [
-                    {
-                        type: "float",
-                        name: "version"
-                    },
-                    {
-                        type: "int",
-                        name: "type"
-                    },
-                    {
-                        type: "string",
-                        length: 32,
-                        name: "author"
-                    },
-                    {
-                        type: "description",
-                        length: 256,
-                        name: "author"
-                    },
-                    {
-                        type: "int",
-                        name: "records"
-                    }
-                ]
-            },
-            MAST: {
-                data: [
-                    {
-                        type: "string",
-                        name: "name"
-                    }
-                ]
-            },
-            DATA: {
-                data: [
-                    {
-                        type: "long",
-                        name: "length"
-                    }
-                ]
-            }
-        },
-        ouput: {
-            
-        }
-    }
-}
+TES3:
+   subrecords:
+      HEDR:
+         data:
+         -  type: float
+            name: version
+         -  type: int
+            name: format
+            enum:
+               0: esp
+               1: esm
+            output:
+               file: header2.yaml
+         -  type: string
+            length: 32
+            name: author
+         -  type: string
+            length: 256
+            name: description
+         -  type: int
+            name: records
+      MAST:
+         data:
+         -  type: string
+            name:
+            - masters
+            - name
+      DATA:
+         data:
+         -  type: long
+            name:
+            - masters
+            - length
+   output:
+      file: header.yaml
+SCPT:
+   subrecords:
+      SCHD:
+         data:
+         -  type: string
+            length: 32
+            name: id
+         -  type: int
+            name: shorts
+         -  type: int
+            name: longs
+         -  type: int
+            name: floats
+         -  type: int
+            name: data
+         -  type: int
+            name: table
+      SCVR:
+         data:
+         -  type: binary
+            output:
+               file: script.var
+      SCDT:
+         data:
+         -  type: hex
+            output:
+               file: script.hex
+      SCTX:
+         data:
+         -  type: string
+            output:
+               file: script.src
+      DELE:
+         data:
+         -  type: marker
+            name: deleted
+            value: true
