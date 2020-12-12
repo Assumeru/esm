@@ -47,22 +47,8 @@ public class ScriptWriterFactory extends AbstractRecordListenerFactory {
 			this.factory = factory;
 		}
 
-		private void closeRecord() throws IOException {
-			if(generator != null) {
-				generator.writeEndObject();
-				generator.close();
-				generator = null;
-				directory = null;
-			}
-			if(open) {
-				open = false;
-				throw new IllegalStateException("Script record without subrecords");
-			}
-		}
-
 		@Override
 		public void onRecord(int type, int flags, int unknown) throws IOException {
-			closeRecord();
 			this.flags = flags;
 			this.unknown = unknown;
 			open = true;
@@ -114,8 +100,22 @@ public class ScriptWriterFactory extends AbstractRecordListenerFactory {
 		}
 
 		@Override
+		public void onRecordEnd() throws IOException {
+			if(generator != null) {
+				generator.writeEndObject();
+				generator.close();
+				generator = null;
+				directory = null;
+			}
+			if(open) {
+				open = false;
+				throw new IllegalStateException("Script record without subrecords");
+			}
+		}
+
+		@Override
 		public void close() throws IOException {
-			closeRecord();
+			onRecordEnd();
 		}
 	}
 }

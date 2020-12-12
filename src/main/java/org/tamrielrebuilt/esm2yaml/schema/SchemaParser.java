@@ -3,9 +3,7 @@ package org.tamrielrebuilt.esm2yaml.schema;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
@@ -13,10 +11,15 @@ import java.util.function.Function;
 import org.tamrielrebuilt.esm2yaml.esm.RecordListener;
 import org.tamrielrebuilt.esm2yaml.esm.RecordUtil;
 import org.tamrielrebuilt.esm2yaml.io.ThrowingConsumer;
-import org.tamrielrebuilt.esm2yaml.schema.builder.Record;
-import org.tamrielrebuilt.esm2yaml.schema.builder.RecordListenerBuilder;
-import org.tamrielrebuilt.esm2yaml.schema.builder.Subrecord;
-import org.tamrielrebuilt.esm2yaml.schema.builder.SubrecordDataBuilder;
+import org.tamrielrebuilt.esm2yaml.schema.dsl.PushInstruction;
+import org.tamrielrebuilt.esm2yaml.schema.dsl.Record;
+import org.tamrielrebuilt.esm2yaml.schema.dsl.RecordInstruction;
+import org.tamrielrebuilt.esm2yaml.schema.dsl.RecordListenerBuilder;
+import org.tamrielrebuilt.esm2yaml.schema.dsl.SetInstruction;
+import org.tamrielrebuilt.esm2yaml.schema.dsl.Subrecord;
+import org.tamrielrebuilt.esm2yaml.schema.dsl.SubrecordDataBuilder;
+import org.tamrielrebuilt.esm2yaml.schema.dsl.VariableField;
+import org.tamrielrebuilt.esm2yaml.schema.dsl.RecordOutput.Type;
 
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
@@ -53,12 +56,9 @@ public class SchemaParser implements Closeable {
 			if("subrecords".equals(key)) {
 				parseSubrecords(builder);
 			} else if("output".equals(key)) {
-				parseObject(field -> {
-					if("file".equals(field)) {
-						builder.setOutputFile(parser.nextTextValue());
-					} else {
-						throw new IllegalStateException("Unexpected record output key " + field);
-					}
+				parseArray(t -> {
+					RecordInstruction.Builder output = builder.addOutput();
+					parseRecordOutput(output);
 				});
 			} else {
 				throw new IllegalStateException("Unexpected record key " + key);
@@ -101,19 +101,25 @@ public class SchemaParser implements Closeable {
 					});
 					builder.setEnum(mappings);
 				} else if("output".equals(key)) {
-					parseObject(field -> {
-						if("file".equals(field)) {
-							builder.setOutputFile(parser.nextTextValue());
-						} else {
-							throw new IllegalStateException("Unexpected data output key " + key);
-						}
+					parseArray(t2 -> {
+						parseObject(outputKey -> {
+							if("push".equals(outputKey)) {
+								VariableField name = parseDataName();
+								builder.addInstruction(new PushInstruction(name, true));
+							} else if("set".equals(outputKey)) {
+								VariableField name = parseDataName();
+								builder.addInstruction(new SetInstruction(name, true));
+							} else {
+								throw new IllegalStateException("Unexpected data output key " + key);
+							}
+						}, false);
 					});
 				} else if("length".equals(key)) {
 					expect(JsonToken.VALUE_NUMBER_INT);
 					builder.setLength(parser.getIntValue());
 				} else if("name".equals(key)) {
-					Field name = parseDataName();
-					builder.setOutputField(name);
+					VariableField name = parseDataName();
+					builder.addInstruction(new SetInstruction(name, true));
 				} else if("value".equals(key)) {
 					parser.nextValue();
 					builder.setOutputValue(parser.getCurrentValue());
@@ -124,17 +130,50 @@ public class SchemaParser implements Closeable {
 		});
 	}
 
-	private Field parseDataName() throws IOException {
+	private void parseRecordOutput(RecordInstruction.Builder builder) throws IOException {
+		parseObject(key -> {
+			if("yaml".equals(key)) {
+				VariableField file = parseDataName();
+				builder.setOutput(file, Type.YAML);
+			} else if("raw".equals(key)) {
+				VariableField file = parseDataName();
+				builder.setOutput(file, Type.RAW);
+			} else if("value".equals(key)) {
+				VariableField field = parseDataName();
+				builder.setVariables(field);
+			} else if("delete".equals(key)) {
+				VariableField field = parseDataName();
+				builder.setVariables(field);
+			} else {
+				throw new IllegalStateException("Unexpected record output key " + key);
+			}
+		}, false);
+	}
+
+	private VariableField parseDataName() throws IOException {
+		VariableField.Builder builder = VariableField.builder();
 		if(parser.nextToken() == JsonToken.VALUE_STRING) {
-			return new Field(parser.getText());
+			builder.append(parser.getText());
 		} else if(parser.currentToken() == JsonToken.START_ARRAY) {
-			List<String> segments = new ArrayList<>();
-			parseArray(t -> {
-				segments.add(parser.getText());
+			parseArray(type -> {
+				if(type.isScalarValue()) {
+					builder.append(parser.getText());
+				} else if(type == JsonToken.START_OBJECT) {
+					parseObject(key -> {
+						if("var".equals(key)) {
+							builder.append(parseDataName(), true);
+						} else {
+							throw new IllegalStateException("Unexpected field key " + key);
+						}
+					}, false);
+				} else {
+					throw new IllegalStateException("Invalid variable segment " + type);
+				}
 			}, false);
-			return new Field(segments);
+		} else {
+			throw new IllegalStateException("Invalid variable field " + parser.currentToken());
 		}
-		throw new IllegalStateException("Invalid data name " + parser.currentToken());
+		return builder.build();
 	}
 
 	private void parseArray(ThrowingConsumer<JsonToken> valueListener) throws IOException {

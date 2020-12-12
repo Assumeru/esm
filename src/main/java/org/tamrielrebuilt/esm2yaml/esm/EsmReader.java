@@ -42,6 +42,7 @@ public class EsmReader implements Closeable {
 		while(subrecords.available() > 0) {
 			readSubrecord(subrecords, listener);
 		}
+		listener.onRecordEnd();
 	}
 
 	private void readSubrecord(EsmInputStream input, RecordListener listener) throws IOException {

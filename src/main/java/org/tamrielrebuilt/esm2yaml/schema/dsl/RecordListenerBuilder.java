@@ -1,4 +1,4 @@
-package org.tamrielrebuilt.esm2yaml.schema.builder;
+package org.tamrielrebuilt.esm2yaml.schema.dsl;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -40,7 +40,6 @@ public class RecordListenerBuilder {
 
 		@Override
 		public void onRecord(int type, int flags, int unknown) throws IOException {
-			current = null;
 			for(Record record : records) {
 				if(record.getType() == type) {
 					current = record;
@@ -55,6 +54,14 @@ public class RecordListenerBuilder {
 			if(current == null || !current.onSubrecord(type, input, context)) {
 				context.onSubrecord(type, input);
 			}
+		}
+
+		@Override
+		public void onRecordEnd() throws IOException {
+			if(current != null) {
+				current.execute(context);
+			}
+			current = null;
 		}
 	}
 }

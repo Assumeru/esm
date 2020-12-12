@@ -9,8 +9,6 @@ TES3:
             enum:
                0: esp
                1: esm
-            output:
-               file: header2.yaml
          -  type: string
             length: 32
             name: author
@@ -22,9 +20,11 @@ TES3:
       MAST:
          data:
          -  type: string
-            name:
-            - masters
-            - name
+            output:
+            -  push: masters
+            -  set:
+               - masters
+               - name
       DATA:
          data:
          -  type: long
@@ -32,7 +32,7 @@ TES3:
             - masters
             - length
    output:
-      file: header.yaml
+   -  yaml: header.yaml
 SCPT:
    subrecords:
       SCHD:
@@ -53,20 +53,40 @@ SCPT:
       SCVR:
          data:
          -  type: binary
-            output:
-               file: script.var
+            name: variables
       SCDT:
          data:
          -  type: hex
-            output:
-               file: script.hex
+            name: hex
       SCTX:
          data:
          -  type: string
-            output:
-               file: script.src
+            name: src
       DELE:
          data:
          -  type: marker
             name: deleted
             value: true
+   output:
+   -  raw:
+      - scripts
+      -  var: id
+      - script.var
+      value: variables
+   -  delete: variables
+   -  raw:
+      - scripts
+      -  var: id
+      - script.hex
+      value: hex
+   -  delete: hex
+   -  raw:
+      - scripts
+      -  var: id
+      - script.src
+      value: src
+   -  delete: src
+   -  yaml:
+      - scripts
+      -  var: id
+      - metadata.yaml

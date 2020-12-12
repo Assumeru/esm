@@ -1,4 +1,4 @@
-package org.tamrielrebuilt.esm2yaml.schema.builder;
+package org.tamrielrebuilt.esm2yaml.schema.dsl;
 
 import java.io.IOException;
 import java.util.ArrayList;

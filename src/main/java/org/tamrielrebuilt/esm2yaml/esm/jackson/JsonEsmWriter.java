@@ -38,6 +38,11 @@ public class JsonEsmWriter implements CloseableRecordListener {
 	}
 
 	@Override
+	public void onRecordEnd() throws IOException {
+		listener.onRecordEnd();
+	}
+
+	@Override
 	public void close() throws IOException {
 		listener.close();
 	}

@@ -31,7 +31,7 @@ public class JsonLockWriter implements CloseableRecordListener, LockFileWriter {
 
 	@Override
 	public void writeRecord(File file) throws IOException {
-		endRecord();
+		onRecordEnd();
 		generator.writeStartObject();
 		String path = file.getAbsolutePath();
 		if(path.startsWith(directory)) {
@@ -52,7 +52,6 @@ public class JsonLockWriter implements CloseableRecordListener, LockFileWriter {
 
 	@Override
 	public void onRecord(int type, int flags, int unknown) throws IOException {
-		endRecord();
 		generator.writeStartObject();
 		recordOpen = true;
 		stringBuffer.setLength(0);
@@ -73,7 +72,8 @@ public class JsonLockWriter implements CloseableRecordListener, LockFileWriter {
 		generator.writeEndObject();
 	}
 
-	private void endRecord() throws IOException {
+	@Override
+	public void onRecordEnd() throws IOException {
 		if(recordOpen) {
 			if(subrecordOpen) {
 				generator.writeEndArray();
@@ -86,7 +86,7 @@ public class JsonLockWriter implements CloseableRecordListener, LockFileWriter {
 
 	@Override
 	public void close() throws IOException {
-		endRecord();
+		onRecordEnd();
 		generator.writeEndArray();
 		generator.close();
 	}
