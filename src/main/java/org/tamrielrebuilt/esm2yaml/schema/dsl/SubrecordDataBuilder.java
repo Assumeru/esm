@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import org.tamrielrebuilt.esm2yaml.esm.EsmInputStream;
 import org.tamrielrebuilt.esm2yaml.io.HexInputStream;
@@ -48,16 +49,21 @@ public class SubrecordDataBuilder {
 
 	DataHandler build() {
 		ValueReader reader = null;
+		Function<String, Object> enumMapper = null;
 		if("int".equals(type)) {
-			if(mappings != null && !mappings.isEmpty()) {
-				reader = createEnumReader(mappings);
-			} else {
-				reader = EsmInputStream::readLEInt;
-			}
+			enumMapper = Integer::parseInt;
+			reader = EsmInputStream::readLEInt;
 		} else if("float".equals(type)) {
 			reader = EsmInputStream::readLEFloat;
 		} else if("long".equals(type)) {
+			enumMapper = Long::parseLong;
 			reader = EsmInputStream::readLELong;
+		} else if("short".equals(type)) {
+			enumMapper = Short::parseShort;
+			reader = EsmInputStream::readLEShort;
+		} else if("byte".equals(type)) {
+			enumMapper = Byte::parseByte;
+			reader = EsmInputStream::read;
 		} else if("string".equals(type)) {
 			if(typeLength == null) {
 				reader = EsmInputStream::readString;
@@ -73,6 +79,9 @@ public class SubrecordDataBuilder {
 		}
 		if(reader == null) {
 			throw new IllegalStateException("Unknown type " + type);
+		}
+		if(enumMapper != null && mappings != null && !mappings.isEmpty()) {
+			reader = createEnumReader(mappings, enumMapper, reader);
 		}
 		return new InstructionDataHandler(instructions, reader);
 	}
@@ -90,13 +99,13 @@ public class SubrecordDataBuilder {
 		};
 	}
 
-	private static ValueReader createEnumReader(Map<String, String> mappings) {
-		Map<Integer, String> parsed = new HashMap<>(mappings.size());
+	private static <T> ValueReader createEnumReader(Map<String, String> mappings, Function<String, T> mapper, ValueReader reader) {
+		Map<T, String> parsed = new HashMap<>(mappings.size());
 		mappings.forEach((key, value) -> {
-			parsed.put(Integer.parseInt(key), value);
+			parsed.put(mapper.apply(key), value);
 		});
 		return input -> {
-			int value = input.readLEInt();
+			Object value = reader.read(input);
 			String mapping = parsed.get(value);
 			if(mapping != null) {
 				return mapping;

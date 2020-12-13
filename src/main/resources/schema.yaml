@@ -33,6 +33,313 @@ TES3:
             - length
    output:
    -  yaml: header.yaml
+ACTI:
+   subrecords:
+      NAME:
+         data:
+         -  type: string
+            name: id
+      MODL:
+         data:
+         -  type: string
+            name: model
+      FNAM:
+         data:
+         -  type: string
+            name: name
+      SCRI:
+         data:
+         -  type: string
+            name: script
+      DELE:
+         data:
+         -  type: marker
+            name: deleted
+            value: true
+   output:
+   -  yaml:
+      - activators
+      -  concat:
+         -  var: id
+         - .yaml
+ALCH:
+   subrecords:
+      NAME:
+         data:
+         -  type: string
+            name: id
+      MODL:
+         data:
+         -  type: string
+            name: model
+      TEXT:
+         data:
+         -  type: string
+            name: icon
+      SCRI:
+         data:
+         -  type: string
+            name: script
+      FNAM:
+         data:
+         -  type: string
+            name: name
+      ALDT:
+         data:
+         -  type: float
+            name: weight
+         -  type: int
+            name: value
+         -  type: int
+            name: autoCalc
+      ENAM:
+         data:
+         -  type: short
+            output:
+            -  push: effects
+            -  set:
+               - effects
+               - id
+         -  type: byte
+            output:
+            -  set:
+               - effects
+               - skill
+         -  type: byte
+            output:
+            -  set:
+               - effects
+               - attribute
+         -  type: int
+            output:
+            -  set:
+               - effects
+               - range
+         -  type: int
+            output:
+            -  set:
+               - effects
+               - area
+         -  type: int
+            output:
+            -  set:
+               - effects
+               - duration
+         -  type: int
+            output:
+            -  set:
+               - effects
+               - min
+         -  type: int
+            output:
+            -  set:
+               - effects
+               - max
+      DELE:
+         data:
+         -  type: marker
+            name: deleted
+            value: true
+   output:
+   -  yaml:
+      - potions
+      -  concat:
+         -  var: id
+         - .yaml
+APPA:
+   subrecords:
+      NAME:
+         data:
+         -  type: string
+            name: id
+      MODL:
+         data:
+         -  type: string
+            name: model
+      FNAM:
+         data:
+         -  type: string
+            name: name
+      AADT:
+         data:
+         -  type: int
+            name: type
+            enum:
+               0: mortar
+               1: alembic
+               2: calcinator
+               3: retort
+         -  type: float
+            name: quality
+         -  type: float
+            name: weight
+         -  type: int
+            name: value
+      SCRI:
+         data:
+         -  type: string
+            name: script
+      DELE:
+         data:
+         -  type: marker
+            name: deleted
+            value: true
+ARMO:
+   subrecords:
+      NAME:
+         data:
+         -  type: string
+            name: id
+      MODL:
+         data:
+         -  type: string
+            name: model
+      FNAM:
+         data:
+         -  type: string
+            name: name
+      AODT:
+         data:
+         -  type: int
+            name: type
+            enum:
+               0: helmet
+               1: cuirass
+               2: left pauldron
+               3: right pauldron
+               4: greaves
+               5: boots
+               6: left gauntlet
+               7: right gauntlet
+               8: shield
+               9: right bracer
+               10: right bracer
+         -  type: float
+            name: weight
+         -  type: int
+            name: value
+         -  type: int
+            name: health
+         -  type: int
+            name: enchant
+         -  type: int
+            name: armor
+      SCRI:
+         data:
+         -  type: string
+            name: script
+      ITEX:
+         data:
+         -  type: string
+            name: icon
+      ENAM:
+         data:
+         -  type: string
+            name: enchantment
+      INDX:
+         data:
+         -  type: byte
+            name: part
+            enum:
+               0: head
+               1: hair
+               2: neck
+               3: cuirass
+               4: groin
+               5: skirt
+               6: right hand
+               7: left hand
+               8: right wrist
+               9: left wrist
+               10: shield
+               11: right forearm
+               12: left forearm
+               13: right upper arm
+               14: left upper arm
+               15: right foot
+               16: left foot
+               17: right ankle
+               18: left ankle
+               19: right knee
+               20: left knee
+               21: right leg
+               22: left leg
+               23: right pauldron
+               24: left pauldron
+               25: weapon
+               26: tail
+            output:
+            -  push: body
+            -  set:
+               - body
+               - part
+         -  type: string
+            output:
+            -  set:
+               - body
+               - male
+         -  type: string
+            output:
+            -  set:
+               - body
+               - female
+      DELE:
+         data:
+         -  type: marker
+            name: deleted
+            value: true
+BODY:
+   subrecords:
+      NAME:
+         data:
+         -  type: string
+            name: id
+      MODL:
+         data:
+         -  type: string
+            name: model
+      FNAM:
+         data:
+         -  type: string
+            name: race
+      BYDT:
+         data:
+         -  type: byte
+            name: part
+            enum:
+               0: head
+               1: hair
+               2: neck
+               3: chest
+               4: groin
+               5: hand
+               6: wrist
+               7: forearm
+               8: upper arm
+               9: foot
+               10: ankle
+               11: knee
+               12: upper leg
+               13: clavicle
+               14: tail
+         -  type: byte
+            name: vampire
+         -  type: byte
+            name: flags
+            enum:
+               1: female
+               2: not playable
+         -  type: byte
+            name: type
+            enum:
+               0: skin
+               1: clothing
+               2: armor
+      DELE:
+         data:
+         -  type: marker
+            name: deleted
+            value: true
 SCPT:
    subrecords:
       SCHD:

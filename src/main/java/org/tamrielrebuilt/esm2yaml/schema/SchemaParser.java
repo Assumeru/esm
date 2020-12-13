@@ -21,11 +21,12 @@ import org.tamrielrebuilt.esm2yaml.schema.dsl.VariableField;
 
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator.Feature;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLParser;
 
 public class SchemaParser implements Closeable {
-	private static final YAMLFactory FACTORY = new YAMLMapper().getFactory();
+	private static final YAMLFactory FACTORY = new YAMLMapper().getFactory().enable(Feature.LITERAL_BLOCK_STYLE);
 	private final YAMLParser parser;
 
 	public static ListenerFactory getBuilder() throws IOException {
@@ -161,6 +162,8 @@ public class SchemaParser implements Closeable {
 					parseObject(key -> {
 						if("var".equals(key)) {
 							builder.append(parseVariableField(), true);
+						} else if("concat".equals(key)) {
+							builder.concat(parseVariableField());
 						} else {
 							throw new IllegalStateException("Unexpected field key " + key);
 						}

@@ -45,6 +45,10 @@ public class VariableField {
 			resolvables.add(new ResolvableVariable(field, local));
 		}
 
+		public void concat(VariableField field) {
+			resolvables.add(new ConcatVariable(field));
+		}
+
 		public VariableField build() {
 			return new VariableField(resolvables);
 		}
