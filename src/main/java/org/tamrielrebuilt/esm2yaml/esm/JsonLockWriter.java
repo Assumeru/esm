@@ -1,37 +1,41 @@
-package org.tamrielrebuilt.esm2yaml.esm.jackson;
+package org.tamrielrebuilt.esm2yaml.esm;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 
-import org.tamrielrebuilt.esm2yaml.esm.CloseableRecordListener;
-import org.tamrielrebuilt.esm2yaml.esm.EsmInputStream;
-import org.tamrielrebuilt.esm2yaml.esm.RecordUtil;
-import org.tamrielrebuilt.esm2yaml.esm.records.LockFileWriter;
+import org.tamrielrebuilt.esm2yaml.schema.LockFileWriter;
 
+import com.fasterxml.jackson.core.JsonEncoding;
+import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 
 public class JsonLockWriter implements CloseableRecordListener, LockFileWriter {
 	private final String directory;
-	private final JsonGenerator generator;
+	private final JsonFactory factory;
 	private final StringBuilder stringBuffer;
 	private final ByteArrayOutputStream byteBuffer;
 	private final byte[] buffer;
-	private boolean recordOpen;
-	private boolean subrecordOpen;
+	private JsonGenerator generator;
 
-	public JsonLockWriter(File directory, JsonGenerator generator) throws IOException {
+	public JsonLockWriter(File directory, JsonFactory factory) {
 		this.directory = directory.getAbsolutePath();
-		this.generator = generator;
+		this.factory = factory;
 		stringBuffer = new StringBuilder(4);
 		byteBuffer = new ByteArrayOutputStream();
 		buffer = new byte[1024];
+	}
+
+	public void open(String file) throws IOException {
+		if(generator != null) {
+			throw new IllegalStateException();
+		}
+		generator = factory.createGenerator(new File(directory, file), JsonEncoding.UTF8);
 		generator.writeStartArray();
 	}
 
 	@Override
 	public void writeRecord(File file) throws IOException {
-		onRecordEnd();
 		generator.writeStartObject();
 		String path = file.getAbsolutePath();
 		if(path.startsWith(directory)) {
@@ -53,13 +57,11 @@ public class JsonLockWriter implements CloseableRecordListener, LockFileWriter {
 	@Override
 	public void onRecord(int type, int flags, int unknown) throws IOException {
 		generator.writeStartObject();
-		recordOpen = true;
 		stringBuffer.setLength(0);
 		RecordUtil.appendTo(stringBuffer, type);
 		generator.writeStringField("type", stringBuffer.toString());
 		writeRecord(generator, flags, unknown);
 		generator.writeArrayFieldStart("subrecords");
-		subrecordOpen = true;
 	}
 
 	@Override
@@ -74,19 +76,12 @@ public class JsonLockWriter implements CloseableRecordListener, LockFileWriter {
 
 	@Override
 	public void onRecordEnd() throws IOException {
-		if(recordOpen) {
-			if(subrecordOpen) {
-				generator.writeEndArray();
-				subrecordOpen = false;
-			}
-			generator.writeEndObject();
-			recordOpen = false;
-		}
+		generator.writeEndArray();
+		generator.writeEndObject();
 	}
 
 	@Override
 	public void close() throws IOException {
-		onRecordEnd();
 		generator.writeEndArray();
 		generator.close();
 	}

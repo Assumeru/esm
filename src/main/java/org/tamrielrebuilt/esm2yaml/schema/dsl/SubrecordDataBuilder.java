@@ -16,15 +16,13 @@ import org.tamrielrebuilt.esm2yaml.schema.Context;
 import org.tamrielrebuilt.esm2yaml.schema.DataHandler;
 
 public class SubrecordDataBuilder {
-	private final Subrecord.Builder parent;
 	private final List<SubrecordInstruction> instructions;
 	private String type;
 	private Map<String, String> mappings;
 	private Object outputValue;
 	private Integer typeLength;
 
-	SubrecordDataBuilder(Subrecord.Builder parent) {
-		this.parent = parent;
+	SubrecordDataBuilder() {
 		instructions = new ArrayList<>();
 	}
 

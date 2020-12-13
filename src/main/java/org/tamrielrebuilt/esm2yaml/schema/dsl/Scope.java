@@ -84,16 +84,16 @@ public class Scope {
 		return output[0];
 	}
 
+	public Object get() {
+		return values;
+	}
+
 	public void delete(List<String> path) {
 		traverse(path, (key, map) -> {
 			if(map != null) {
 				map.remove(key);
 			}
 		}, false);
-	}
-
-	public boolean isEmpty() {
-		return values.isEmpty();
 	}
 
 	public void clear() {

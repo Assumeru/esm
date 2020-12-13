@@ -6,30 +6,29 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.Function;
 
-import org.tamrielrebuilt.esm2yaml.esm.RecordListener;
 import org.tamrielrebuilt.esm2yaml.esm.RecordUtil;
 import org.tamrielrebuilt.esm2yaml.io.ThrowingConsumer;
+import org.tamrielrebuilt.esm2yaml.schema.dsl.ListenerFactory;
 import org.tamrielrebuilt.esm2yaml.schema.dsl.PushInstruction;
 import org.tamrielrebuilt.esm2yaml.schema.dsl.Record;
 import org.tamrielrebuilt.esm2yaml.schema.dsl.RecordInstruction;
-import org.tamrielrebuilt.esm2yaml.schema.dsl.RecordListenerBuilder;
+import org.tamrielrebuilt.esm2yaml.schema.dsl.RecordOutput.Type;
 import org.tamrielrebuilt.esm2yaml.schema.dsl.SetInstruction;
 import org.tamrielrebuilt.esm2yaml.schema.dsl.Subrecord;
 import org.tamrielrebuilt.esm2yaml.schema.dsl.SubrecordDataBuilder;
 import org.tamrielrebuilt.esm2yaml.schema.dsl.VariableField;
-import org.tamrielrebuilt.esm2yaml.schema.dsl.RecordOutput.Type;
 
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLParser;
 
 public class SchemaParser implements Closeable {
-	private static final YAMLFactory FACTORY = new YAMLFactory();
+	private static final YAMLFactory FACTORY = new YAMLMapper().getFactory();
 	private final YAMLParser parser;
 
-	public static Function<Context, RecordListener> getBuilder() throws IOException {
+	public static ListenerFactory getBuilder() throws IOException {
 		try(SchemaParser schema = new SchemaParser(SchemaParser.class.getResourceAsStream("/schema.yaml"))) {
 			return schema.parse();
 		}
@@ -39,8 +38,8 @@ public class SchemaParser implements Closeable {
 		parser = FACTORY.createParser(Objects.requireNonNull(input));
 	}
 
-	public Function<Context, RecordListener> parse() throws IOException {
-		RecordListenerBuilder builder = new RecordListenerBuilder();
+	public ListenerFactory parse() throws IOException {
+		ListenerFactory.Builder builder = ListenerFactory.builder();
 		parseObject(recordName -> {
 			if(recordName.length() != 4) {
 				throw new IllegalStateException("Expected record, found " + recordName);
@@ -48,7 +47,7 @@ public class SchemaParser implements Closeable {
 			int record = RecordUtil.getValue(recordName);
 			parseRecord(builder.addRecord(record));
 		});
-		return builder.build();
+		return builder.build(FACTORY);
 	}
 
 	private void parseRecord(Record.Builder builder) throws IOException {
@@ -104,10 +103,10 @@ public class SchemaParser implements Closeable {
 					parseArray(t2 -> {
 						parseObject(outputKey -> {
 							if("push".equals(outputKey)) {
-								VariableField name = parseDataName();
+								VariableField name = parseVariableField();
 								builder.addInstruction(new PushInstruction(name, true));
 							} else if("set".equals(outputKey)) {
-								VariableField name = parseDataName();
+								VariableField name = parseVariableField();
 								builder.addInstruction(new SetInstruction(name, true));
 							} else {
 								throw new IllegalStateException("Unexpected data output key " + key);
@@ -118,7 +117,7 @@ public class SchemaParser implements Closeable {
 					expect(JsonToken.VALUE_NUMBER_INT);
 					builder.setLength(parser.getIntValue());
 				} else if("name".equals(key)) {
-					VariableField name = parseDataName();
+					VariableField name = parseVariableField();
 					builder.addInstruction(new SetInstruction(name, true));
 				} else if("value".equals(key)) {
 					parser.nextValue();
@@ -133,24 +132,24 @@ public class SchemaParser implements Closeable {
 	private void parseRecordOutput(RecordInstruction.Builder builder) throws IOException {
 		parseObject(key -> {
 			if("yaml".equals(key)) {
-				VariableField file = parseDataName();
+				VariableField file = parseVariableField();
 				builder.setOutput(file, Type.YAML);
 			} else if("raw".equals(key)) {
-				VariableField file = parseDataName();
+				VariableField file = parseVariableField();
 				builder.setOutput(file, Type.RAW);
 			} else if("value".equals(key)) {
-				VariableField field = parseDataName();
+				VariableField field = parseVariableField();
 				builder.setVariables(field);
 			} else if("delete".equals(key)) {
-				VariableField field = parseDataName();
-				builder.setVariables(field);
+				VariableField field = parseVariableField();
+				builder.deleteVariable(field);
 			} else {
 				throw new IllegalStateException("Unexpected record output key " + key);
 			}
 		}, false);
 	}
 
-	private VariableField parseDataName() throws IOException {
+	private VariableField parseVariableField() throws IOException {
 		VariableField.Builder builder = VariableField.builder();
 		if(parser.nextToken() == JsonToken.VALUE_STRING) {
 			builder.append(parser.getText());
@@ -161,7 +160,7 @@ public class SchemaParser implements Closeable {
 				} else if(type == JsonToken.START_OBJECT) {
 					parseObject(key -> {
 						if("var".equals(key)) {
-							builder.append(parseDataName(), true);
+							builder.append(parseVariableField(), true);
 						} else {
 							throw new IllegalStateException("Unexpected field key " + key);
 						}

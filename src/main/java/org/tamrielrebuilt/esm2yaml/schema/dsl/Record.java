@@ -57,7 +57,7 @@ public class Record implements RecordInstruction {
 		}
 
 		public RecordInstruction.Builder addOutput() {
-			RecordInstruction.Builder builder = new RecordInstruction.Builder(this);
+			RecordInstruction.Builder builder = new RecordInstruction.Builder();
 			outputBuilders.add(builder);
 			return builder;
 		}

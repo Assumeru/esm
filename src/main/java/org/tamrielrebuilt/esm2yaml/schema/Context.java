@@ -1,18 +1,27 @@
 package org.tamrielrebuilt.esm2yaml.schema;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
-import org.tamrielrebuilt.esm2yaml.esm.EsmInputStream;
-import org.tamrielrebuilt.esm2yaml.esm.RecordListener;
 import org.tamrielrebuilt.esm2yaml.schema.dsl.Scope;
 import org.tamrielrebuilt.esm2yaml.schema.dsl.VariableField;
 
-public class Context implements RecordListener {
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerator;
+
+public class Context {
+	private final File directory;
+	private final JsonFactory factory;
+	private final LockFileWriter lock;
 	private final Scope globalVariables;
 	private final Scope localVariables;
 
-	public Context() {
+	public Context(File directory, JsonFactory factory, LockFileWriter lock) {
+		this.directory = directory;
+		this.factory = factory;
+		this.lock = lock;
 		globalVariables = new Scope();
 		localVariables = new Scope();
 	}
@@ -29,21 +38,33 @@ public class Context implements RecordListener {
 		return (local ? localVariables : globalVariables).get(path.getPath(this));
 	}
 
+	public Object getVariable(boolean local) {
+		return (local ? localVariables : globalVariables).get();
+	}
+
 	public void unsetVariable(VariableField path, boolean local) {
 		(local ? localVariables : globalVariables).delete(path.getPath(this));
 	}
 
-	public File getFile(VariableField path) {
-		//TODO
-		return null;
+	private File getFile(VariableField path) throws IOException {
+		File file = directory;
+		for(String segment : path.getPath(this)) {
+			file = new File(file, segment);
+		}
+		file.getParentFile().mkdirs();
+		lock.writeRecord(file);
+		return file;
 	}
 
-	@Override
+	public OutputStream open(VariableField path) throws IOException {
+		return new FileOutputStream(getFile(path));
+	}
+
+	public JsonGenerator openYaml(VariableField path) throws IOException {
+		return factory.createGenerator(open(path));
+	}
+
 	public void onRecord(int type, int flags, int unknown) throws IOException {
-		if(!localVariables.isEmpty()) {
-			System.out.println(localVariables);
-		}
-		localVariables.clear();
 		if(flags != 0) {
 			localVariables.set("recordFlags", flags);
 		}
@@ -52,8 +73,7 @@ public class Context implements RecordListener {
 		}
 	}
 
-	@Override
-	public void onSubrecord(int type, EsmInputStream input) throws IOException {
-		input.skip(input.available());
+	public void onRecordEnd() throws IOException {
+		localVariables.clear();
 	}
 }

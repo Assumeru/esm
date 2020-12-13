@@ -44,7 +44,7 @@ public class Subrecord implements DataHandler {
 		}
 
 		public SubrecordDataBuilder addData() {
-			SubrecordDataBuilder builder = new SubrecordDataBuilder(this);
+			SubrecordDataBuilder builder = new SubrecordDataBuilder();
 			builders.add(builder);
 			return builder;
 		}

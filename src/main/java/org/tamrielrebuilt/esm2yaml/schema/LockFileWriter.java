@@ -1,4 +1,4 @@
-package org.tamrielrebuilt.esm2yaml.esm.records;
+package org.tamrielrebuilt.esm2yaml.schema;
 
 import java.io.File;
 import java.io.IOException;

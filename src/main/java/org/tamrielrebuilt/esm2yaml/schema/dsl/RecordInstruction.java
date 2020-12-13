@@ -9,15 +9,10 @@ public interface RecordInstruction {
 	void execute(Context context) throws IOException;
 
 	public class Builder {
-		private final Record.Builder parent;
 		private VariableField file;
 		private Type type;
 		private VariableField variables;
 		private VariableField deleteLocal;
-
-		public Builder(Record.Builder parent) {
-			this.parent = parent;
-		}
 
 		public void setOutput(VariableField file, Type type) {
 			this.file = file;

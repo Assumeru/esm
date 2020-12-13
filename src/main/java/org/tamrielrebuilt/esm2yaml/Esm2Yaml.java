@@ -3,18 +3,19 @@ package org.tamrielrebuilt.esm2yaml;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.function.Function;
 
+import org.tamrielrebuilt.esm2yaml.esm.CloseableRecordListener;
 import org.tamrielrebuilt.esm2yaml.esm.EsmInputStream;
 import org.tamrielrebuilt.esm2yaml.esm.EsmReader;
 import org.tamrielrebuilt.esm2yaml.esm.RecordListener;
-import org.tamrielrebuilt.esm2yaml.schema.Context;
 import org.tamrielrebuilt.esm2yaml.schema.SchemaParser;
+import org.tamrielrebuilt.esm2yaml.schema.dsl.ListenerFactory;
 
 public class Esm2Yaml {
 	public static void main(String[] args) throws IOException {
-		Function<Context, RecordListener> builder = SchemaParser.getBuilder();
-		RecordListener listener = builder.apply(new Context());
+		File directory = new File("C:\\Users\\EE\\Desktop\\test\\src");
+
+		ListenerFactory builder = SchemaParser.getBuilder();
 		
 		
 		
@@ -22,9 +23,9 @@ public class Esm2Yaml {
 		String dataFiles = "F:\\Program Files (x86)\\Morrowind\\Data Files";
 //		File file = new File(dataFiles, "HB_Dark_Guars_V11.ESP");
 		File file = new File(dataFiles, "0PC_shrinetest.ESP");
-		File directory = new File("C:\\Users\\EE\\Desktop\\test\\src");
 		
-		try(EsmReader reader = new EsmReader(file, StandardCharsets.ISO_8859_1)) {
+		try(EsmReader reader = new EsmReader(file, StandardCharsets.ISO_8859_1);
+				CloseableRecordListener listener = builder.build(directory)) {
 			reader.read(listener);
 		}
 		
