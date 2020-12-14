@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.function.Function;
 
 import org.tamrielrebuilt.esm2yaml.esm.EsmInputStream;
@@ -20,6 +21,7 @@ public class SubrecordDataBuilder {
 	private final List<SubrecordInstruction> instructions;
 	private String type;
 	private Map<String, String> mappings;
+	private Map<String, String> flags;
 	private Object outputValue;
 	private Integer typeLength;
 
@@ -33,6 +35,10 @@ public class SubrecordDataBuilder {
 
 	public void setEnum(Map<String, String> mappings) {
 		this.mappings = mappings;
+	}
+
+	public void setFlags(Map<String, String> flags) {
+		this.flags = flags;
 	}
 
 	public void setOutputValue(Object outputValue) {
@@ -49,20 +55,20 @@ public class SubrecordDataBuilder {
 
 	DataHandler build() {
 		ValueReader reader = null;
-		Function<String, Object> enumMapper = null;
+		Function<String, Number> typeMapper = null;
 		if("int".equals(type)) {
-			enumMapper = Integer::parseInt;
+			typeMapper = Integer::parseInt;
 			reader = EsmInputStream::readLEInt;
 		} else if("float".equals(type)) {
 			reader = EsmInputStream::readLEFloat;
 		} else if("long".equals(type)) {
-			enumMapper = Long::parseLong;
+			typeMapper = Long::parseLong;
 			reader = EsmInputStream::readLELong;
 		} else if("short".equals(type)) {
-			enumMapper = Short::parseShort;
+			typeMapper = Short::parseShort;
 			reader = EsmInputStream::readLEShort;
 		} else if("byte".equals(type)) {
-			enumMapper = Byte::parseByte;
+			typeMapper = Integer::parseInt;
 			reader = EsmInputStream::read;
 		} else if("string".equals(type)) {
 			if(typeLength == null) {
@@ -80,8 +86,10 @@ public class SubrecordDataBuilder {
 		if(reader == null) {
 			throw new IllegalStateException("Unknown type " + type);
 		}
-		if(enumMapper != null && mappings != null && !mappings.isEmpty()) {
-			reader = createEnumReader(mappings, enumMapper, reader);
+		if(typeMapper != null && mappings != null && !mappings.isEmpty()) {
+			reader = createEnumReader(mappings, typeMapper, reader);
+		} else if(typeMapper != null && flags != null && !flags.isEmpty()) {
+			reader = createFlagReader(flags, typeMapper, reader);
 		}
 		return new InstructionDataHandler(instructions, reader);
 	}
@@ -99,11 +107,8 @@ public class SubrecordDataBuilder {
 		};
 	}
 
-	private static <T> ValueReader createEnumReader(Map<String, String> mappings, Function<String, T> mapper, ValueReader reader) {
-		Map<T, String> parsed = new HashMap<>(mappings.size());
-		mappings.forEach((key, value) -> {
-			parsed.put(mapper.apply(key), value);
-		});
+	private <T> ValueReader createEnumReader(Map<String, String> mappings, Function<String, T> mapper, ValueReader reader) {
+		Map<T, String> parsed = parseNamed(mappings, mapper);
 		return input -> {
 			Object value = reader.read(input);
 			String mapping = parsed.get(value);
@@ -112,6 +117,35 @@ public class SubrecordDataBuilder {
 			}
 			return value;
 		};
+	}
+
+	private <T extends Number> ValueReader createFlagReader(Map<String, String> flags, Function<String, T> mapper, ValueReader reader) {
+		Map<T, String> parsed = parseNamed(flags, mapper);
+		return input -> {
+			long value = ((Number) reader.read(input)).longValue();
+			List<Object> values = new ArrayList<>();
+			for(Entry<T, String> entry : parsed.entrySet()) {
+				long key = entry.getKey().longValue();
+				if((value & key) != 0) {
+					values.add(entry.getValue());
+					value ^= key;
+				}
+			}
+			if(value != 0) {
+				values.add(value);
+			} else if(values.isEmpty()) {
+				return null;
+			}
+			return values;
+		};
+	}
+
+	private <T> Map<T, String> parseNamed(Map<String, String> named, Function<String, T> mapper) {
+		Map<T, String> parsed = new HashMap<>(named.size());
+		named.forEach((key, value) -> {
+			parsed.put(mapper.apply(key), value);
+		});
+		return parsed;
 	}
 
 	private static ValueReader createStringReader(int length) {

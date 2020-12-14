@@ -19,6 +19,7 @@ import org.tamrielrebuilt.esm2yaml.schema.dsl.Subrecord;
 import org.tamrielrebuilt.esm2yaml.schema.dsl.SubrecordDataBuilder;
 import org.tamrielrebuilt.esm2yaml.schema.dsl.VariableField;
 
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator.Feature;
@@ -26,7 +27,13 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLParser;
 
 public class SchemaParser implements Closeable {
-	private static final YAMLFactory FACTORY = new YAMLMapper().getFactory().enable(Feature.LITERAL_BLOCK_STYLE);
+	private static final YAMLFactory FACTORY;
+	static {
+		YAMLMapper mapper = new YAMLMapper();
+		mapper.setSerializationInclusion(Include.NON_NULL);
+		mapper.enable(Feature.LITERAL_BLOCK_STYLE);
+		FACTORY = mapper.getFactory();
+	}
 	private final YAMLParser parser;
 
 	public static ListenerFactory getBuilder() throws IOException {
@@ -123,6 +130,13 @@ public class SchemaParser implements Closeable {
 				} else if("value".equals(key)) {
 					parser.nextValue();
 					builder.setOutputValue(parser.getCurrentValue());
+				} else if("flags".equals(key)) {
+					Map<String, String> mappings = new HashMap<>();
+					parseObject(value -> {
+						String name = parser.nextTextValue();
+						mappings.put(value, name);
+					});
+					builder.setFlags(mappings);
 				} else {
 					throw new IllegalStateException("Unexpected data key " + key);
 				}

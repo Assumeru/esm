@@ -184,6 +184,12 @@ APPA:
          -  type: marker
             name: deleted
             value: true
+   output:
+   -  yaml:
+      - apparatus
+      -  concat:
+         -  var: id
+         - .yaml
 ARMO:
    subrecords:
       NAME:
@@ -288,6 +294,12 @@ ARMO:
          -  type: marker
             name: deleted
             value: true
+   output:
+   -  yaml:
+      - armor
+      -  concat:
+         -  var: id
+         - .yaml
 BODY:
    subrecords:
       NAME:
@@ -326,7 +338,7 @@ BODY:
             name: vampire
          -  type: byte
             name: flags
-            enum:
+            flags:
                1: female
                2: not playable
          -  type: byte
@@ -340,6 +352,107 @@ BODY:
          -  type: marker
             name: deleted
             value: true
+   output:
+   -  yaml:
+      - bodyparts
+      -  concat:
+         -  var: id
+         - .yaml
+BOOK:
+   subrecords:
+      NAME:
+         data:
+         -  type: string
+            name: id
+      MODL:
+         data:
+         -  type: string
+            name: model
+      FNAM:
+         data:
+         -  type: string
+            name: name
+      BKDT:
+         data:
+         -  type: float
+            name: weight
+         -  type: int
+            name: value
+         -  type: int
+            name: scroll
+         -  type: int
+            name: skill
+         -  type: int
+            name: enchant
+      SCRI:
+         data:
+         -  type: string
+            name: script
+      ITEX:
+         data:
+         -  type: string
+            name: icon
+      ENAM:
+         data:
+         -  type: string
+            name: enchantment
+      TEXT:
+         data:
+         -  type: string
+            name: text
+      DELE:
+         data:
+         -  type: marker
+            name: deleted
+            value: true
+   output:
+   -  raw:
+      - books
+      -  var: id
+      - text.html
+      value: text
+   -  delete: text
+   -  yaml:
+      - books
+      -  var: id
+      - metadata.yaml
+BSGN:
+   subrecords:
+      NAME:
+         data:
+         -  type: string
+            name: id
+      FNAM:
+         data:
+         -  type: string
+            name: name
+      TNAM:
+         data:
+         -  type: string
+            name: texture
+      DESC:
+         data:
+         -  type: string
+            name: description
+      NPCS:
+         data:
+         -  type: string
+            output:
+            -  push: powers
+            -  set:
+               - powers
+               - id
+      DELE:
+         data:
+         -  type: marker
+            name: deleted
+            value: true
+   output:
+   -  yaml:
+      - birthsigns
+      -  concat:
+         -  var: id
+         - .yaml
 SCPT:
    subrecords:
       SCHD:

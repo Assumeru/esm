@@ -15,7 +15,8 @@ public class Esm2Yaml {
 		File directory = new File("C:\\Users\\EE\\Desktop\\test\\src");
 		String dataFiles = "F:\\Program Files (x86)\\Morrowind\\Data Files";
 //		File file = new File(dataFiles, "HB_Dark_Guars_V11.ESP");
-		File file = new File(dataFiles, "0PC_shrinetest.ESP");
+//		File file = new File(dataFiles, "0PC_shrinetest.ESP");
+		File file = new File(dataFiles, "Tribunal.ESM");
 		
 		toYaml(file, directory, StandardCharsets.ISO_8859_1);
 	}
