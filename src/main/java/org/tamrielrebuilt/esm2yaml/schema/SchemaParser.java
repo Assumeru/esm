@@ -35,6 +35,7 @@ public class SchemaParser implements Closeable {
 		FACTORY = mapper.getFactory();
 	}
 	private final YAMLParser parser;
+	private final Map<String, Map<String, String>> definitions;
 
 	public static ListenerFactory getBuilder() throws IOException {
 		try(SchemaParser schema = new SchemaParser(SchemaParser.class.getResourceAsStream("/schema.yaml"))) {
@@ -44,10 +45,26 @@ public class SchemaParser implements Closeable {
 
 	public SchemaParser(InputStream input) throws IOException {
 		parser = FACTORY.createParser(Objects.requireNonNull(input));
+		definitions = new HashMap<>();
 	}
 
 	public ListenerFactory parse() throws IOException {
 		ListenerFactory.Builder builder = ListenerFactory.builder();
+		parseObject(key -> {
+			if("defs".equals(key)) {
+				parseObject(def -> {
+					definitions.put(def, parseStringMap());
+				});
+			} else if("records".equals(key)) {
+				parseRecords(builder);
+			} else {
+				throw new IllegalStateException("Unknown root key " + key);
+			}
+		});
+		return builder.build(FACTORY);
+	}
+
+	private void parseRecords(ListenerFactory.Builder builder) throws IOException {
 		parseObject(recordName -> {
 			if(recordName.length() != 4) {
 				throw new IllegalStateException("Expected record, found " + recordName);
@@ -55,7 +72,6 @@ public class SchemaParser implements Closeable {
 			int record = RecordUtil.getValue(recordName);
 			parseRecord(builder.addRecord(record));
 		});
-		return builder.build(FACTORY);
 	}
 
 	private void parseRecord(Record.Builder builder) throws IOException {
@@ -101,12 +117,7 @@ public class SchemaParser implements Closeable {
 				if("type".equals(key)) {
 					builder.setType(parser.nextTextValue());
 				} else if("enum".equals(key)) {
-					Map<String, String> mappings = new HashMap<>();
-					parseObject(value -> {
-						String name = parser.nextTextValue();
-						mappings.put(value, name);
-					});
-					builder.setEnum(mappings);
+					builder.setEnum(parseStringMap());
 				} else if("output".equals(key)) {
 					parseArray(t2 -> {
 						parseObject(outputKey -> {
@@ -131,12 +142,7 @@ public class SchemaParser implements Closeable {
 					parser.nextValue();
 					builder.setOutputValue(parser.getCurrentValue());
 				} else if("flags".equals(key)) {
-					Map<String, String> mappings = new HashMap<>();
-					parseObject(value -> {
-						String name = parser.nextTextValue();
-						mappings.put(value, name);
-					});
-					builder.setFlags(mappings);
+					builder.setFlags(parseStringMap());
 				} else if("array".equals(key)) {
 					expect(JsonToken.VALUE_NUMBER_INT);
 					builder.setArray(parser.getIntValue());
@@ -193,6 +199,19 @@ public class SchemaParser implements Closeable {
 			throw new IllegalStateException("Invalid variable field " + parser.currentToken());
 		}
 		return builder.build();
+	}
+
+	private Map<String, String> parseStringMap() throws IOException {
+		JsonToken token = parser.nextToken();
+		if(token.isScalarValue()) {
+			return definitions.get(parser.getText());
+		}
+		Map<String, String> map = new HashMap<>();
+		parseObject(key -> {
+			String value = parser.nextTextValue();
+			map.put(key, value);
+		}, false);
+		return map;
 	}
 
 	private void parseArray(ThrowingConsumer<JsonToken> valueListener) throws IOException {
