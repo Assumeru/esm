@@ -643,7 +643,60 @@ records:
          -  concat:
             -  var: id
             - .yaml
-         
+   CONT:
+      subrecords:
+         NAME:
+            data:
+            -  type: string
+               name: id
+         MODL:
+            data:
+            -  type: string
+               name: model
+         FNAM:
+            data:
+            -  type: string
+               name: name
+         CNDT:
+            data:
+            -  type: float
+               name: weight
+         FLAG:
+            data:
+            -  type: int
+               name: flags
+               flags:
+                  1: organic
+                  2: respawns
+         SCRI:
+            data:
+            -  type: string
+               name: script
+         NPCO:
+            data:
+            -  type: int
+               output:
+               -  push: inventory
+               -  set:
+                  - inventory
+                  - amount
+            -  type: string
+               length: 32
+               output:
+               -  set:
+                  - inventory
+                  - item
+         DELE:
+            data:
+            -  type: marker
+               name: deleted
+               value: true
+      output:
+      -  yaml:
+         - containers
+         -  concat:
+            -  var: id
+            - .yaml
    SCPT:
       subrecords:
          SCHD:
