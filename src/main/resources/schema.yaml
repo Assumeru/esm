@@ -697,6 +697,181 @@ records:
          -  concat:
             -  var: id
             - .yaml
+   CREA:
+      subrecords:
+         NAME:
+            data:
+            -  type: string
+               name: id
+         MODL:
+            data:
+            -  type: string
+               name: model
+         CNAM:
+            data:
+            -  type: string
+               name: original
+         FNAM:
+            data:
+            -  type: string
+               name: name
+         SCRI:
+            data:
+            -  type: string
+               name: script
+         NPDT:
+            data:
+            -  type: int
+               name: type
+               enum:
+                  0: creature
+                  1: daedra
+                  2: undead
+                  3: humanoid
+            -  type: int
+               name: level
+            -  type: int
+               name: strength
+            -  type: int
+               name: intelligence
+            -  type: int
+               name: willpower
+            -  type: int
+               name: agility
+            -  type: int
+               name: speed
+            -  type: int
+               name: endurance
+            -  type: int
+               name: personality
+            -  type: int
+               name: luck
+            -  type: int
+               name: health
+            -  type: int
+               name: magicka
+            -  type: int
+               name: fatigue
+            -  type: int
+               name: soul
+            -  type: int
+               name: combat
+            -  type: int
+               name: magic
+            -  type: int
+               name: stealth
+            -  type: int
+               name: attack
+               array: 6
+            -  type: int
+               name: gold
+         FLAG:
+            data:
+            -  type: int
+               name: flags
+               flags:
+                  1: bipedal
+                  2: respawns
+                  4: weapon
+                  16: swims
+                  32: flies
+                  64: walks
+                  128: essential
+                  512: red blood
+                  1024: white blood
+                  2048: gold blood
+         XSCL:
+            data:
+            -  type: float
+               name: scale
+         NPCO:
+            data:
+            -  type: int
+               output:
+               -  push: inventory
+               -  set:
+                  - inventory
+                  - amount
+            -  type: string
+               length: 32
+               output:
+               -  set:
+                  - inventory
+                  - item
+         NPCS:
+            data:
+            -  type: string
+               output:
+               -  push: spells
+               -  set:
+                  - spells
+                  - id
+         AIDT:
+            data:
+            -  type: short
+               name: hello
+            -  type: byte
+               name: fight
+            -  type: byte
+               name: flee
+            -  type: byte
+               name: alarm
+            -  type: byte
+               array: 3
+               name: aipadding
+            -  type: int
+               name: services
+         DODT:
+            data:
+            -  type: float
+               output:
+               -  push: travel
+               -  set:
+                  - travel
+                  - x
+            -  type: float
+               output:
+               -  set:
+                  - travel
+                  - y
+            -  type: float
+               output:
+               -  set:
+                  - travel
+                  - z
+            -  type: float
+               output:
+               -  set:
+                  - travel
+                  - rotX
+            -  type: float
+               output:
+               -  set:
+                  - travel
+                  - rotY
+            -  type: float
+               output:
+               -  set:
+                  - travel
+                  - rotZ
+         DNAM:
+            data:
+            -  type: string
+               output:
+               -  set:
+                  - travel
+                  - cell
+         DELE:
+            data:
+            -  type: marker
+               name: deleted
+               value: true
+      output:
+      -  yaml:
+         - creatures
+         -  concat:
+            -  var: id
+            - .yaml
    SCPT:
       subrecords:
          SCHD:
