@@ -137,6 +137,9 @@ public class SchemaParser implements Closeable {
 						mappings.put(value, name);
 					});
 					builder.setFlags(mappings);
+				} else if("array".equals(key)) {
+					expect(JsonToken.VALUE_NUMBER_INT);
+					builder.setArray(parser.getIntValue());
 				} else {
 					throw new IllegalStateException("Unexpected data key " + key);
 				}

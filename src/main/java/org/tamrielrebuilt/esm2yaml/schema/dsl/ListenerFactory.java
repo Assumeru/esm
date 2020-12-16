@@ -109,5 +109,10 @@ public class ListenerFactory {
 		public void close() throws IOException {
 			lock.close();
 		}
+
+		@Override
+		public String toString() {
+			return "context: " + context + "\nrecords: " + records + "\nlock: " + lock + "\ncurrent: " + current;
+		}
 	}
 }

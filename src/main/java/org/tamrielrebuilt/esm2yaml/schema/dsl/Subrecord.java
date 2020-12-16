@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.tamrielrebuilt.esm2yaml.esm.EsmInputStream;
+import org.tamrielrebuilt.esm2yaml.esm.RecordUtil;
 import org.tamrielrebuilt.esm2yaml.schema.Context;
 import org.tamrielrebuilt.esm2yaml.schema.DataHandler;
 
@@ -26,6 +27,11 @@ public class Subrecord implements DataHandler {
 		for(DataHandler handler : data) {
 			handler.handle(input, context);
 		}
+	}
+
+	@Override
+	public String toString() {
+		return RecordUtil.appendTo(new StringBuilder("Subrecord "), type).toString();
 	}
 
 	public static class Builder {

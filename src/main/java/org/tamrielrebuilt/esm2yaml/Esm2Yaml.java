@@ -16,16 +16,19 @@ public class Esm2Yaml {
 		String dataFiles = "F:\\Program Files (x86)\\Morrowind\\Data Files";
 //		File file = new File(dataFiles, "HB_Dark_Guars_V11.ESP");
 //		File file = new File(dataFiles, "0PC_shrinetest.ESP");
-		File file = new File(dataFiles, "Tribunal.ESM");
+		File file = new File(dataFiles, "Bloodmoon.ESM");
 		
 		toYaml(file, directory, StandardCharsets.ISO_8859_1);
 	}
 
 	private static void toYaml(File esx, File output, Charset charset) throws IOException {
 		ListenerFactory builder = SchemaParser.getBuilder();
-		try(EsmReader reader = new EsmReader(esx, charset);
-				CloseableRecordListener listener = builder.build(output)) {
-			reader.read(listener);
+		try(CloseableRecordListener listener = builder.build(output)) {
+			try(EsmReader reader = new EsmReader(esx, charset)) {
+				reader.read(listener);
+			} catch(Exception e) {
+				throw new IOException(listener.toString(), e);
+			}
 		}
 	}
 }

@@ -38,20 +38,28 @@ public class EsmReader implements Closeable {
 		int unknown = input.readLEInt();
 		int flags = input.readLEInt();
 		EsmInputStream subrecords = new EsmInputStream(new InputStreamView(input, size), input.getCharset());
-		listener.onRecord(type, flags, unknown);
-		while(subrecords.available() > 0) {
-			readSubrecord(subrecords, listener);
+		try {
+			listener.onRecord(type, flags, unknown);
+			while(subrecords.available() > 0) {
+				readSubrecord(subrecords, listener);
+			}
+			listener.onRecordEnd();
+		} catch(Exception e) {
+			throw new IOException(RecordUtil.appendTo(new StringBuilder("Exception at record "), type).toString(), e);
 		}
-		listener.onRecordEnd();
 	}
 
 	private void readSubrecord(EsmInputStream input, RecordListener listener) throws IOException {
 		int type = input.readInt();
 		long size = input.readLEInt() & 0xFFFFFFFFl;
 		EsmInputStream subrecord = new EsmInputStream(new InputStreamView(input, size), input.getCharset());
-		listener.onSubrecord(type, subrecord);
-		if(subrecord.available() > 0) {
-			throw new IllegalStateException(RecordUtil.appendTo(new StringBuilder("Failed to read complete subrecord "), type).toString());
+		try {
+			listener.onSubrecord(type, subrecord);
+			if(subrecord.available() > 0) {
+				throw new IllegalStateException("Failed to read complete subrecord");
+			}
+		} catch(Exception e) {
+			throw new IOException(RecordUtil.appendTo(new StringBuilder("Exception at subrecord "), type).toString(), e);
 		}
 	}
 

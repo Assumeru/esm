@@ -453,6 +453,107 @@ BSGN:
       -  concat:
          -  var: id
          - .yaml
+CLAS:
+   subrecords:
+      NAME:
+         data:
+         -  type: string
+            name: id
+      FNAM:
+         data:
+         -  type: string
+            name: name
+      CLDT:
+         data:
+         -  type: int
+            name: attributes
+            array: 2
+            enum:
+               0: strength
+               1: intelligence
+               2: willpower
+               3: agility
+               4: speed
+               5: endurance
+               6: personality
+               7: luck
+         -  type: int
+            name: specialization
+            enum:
+               0: combat
+               1: magic
+               2: stealth
+         -  type: int
+            name: skills
+            array: 10
+            enum:
+               0: block
+               1: armorer,
+               2: medium armor
+               3: heavy armor
+               4: blunt
+               5: long blade
+               6: axe
+               7: spear
+               8: athletics
+               9: enchant
+               10: destruction
+               11: alteration
+               12: illusion
+               13: conjuration
+               14: nysticism
+               15: restoration
+               16: alchemy
+               17: unarmored
+               18: security
+               19: sneak
+               20: acrobatics
+               21: light armor
+               22: short blade
+               23: marksman
+               24: mercantile
+               25: speechcraft
+               26: hand to hand
+         -  type: int
+            name: playable
+            flags:
+               1: true
+         -  type: int
+            name: autoCalc
+            flags:
+               1: weapons
+               2: armor
+               4: clothing
+               8: books
+               16: ingredients
+               32: lockpicks
+               64: probes
+               128: lights
+               256: apparatus
+               512: hammers
+               1024: misc
+               2048: spells
+               4096: magic items
+               8192: potions
+               16384: training
+               32768: spellmaking
+               65536: enchanting
+               131072: repair
+      DESC:
+         data:
+         -  type: string
+            name: description
+      DELE:
+         data:
+         -  type: marker
+            name: deleted
+            value: true
+   output:
+   -  yaml:
+      - classes
+      -  concat:
+         -  var: id
+         - .yaml
 SCPT:
    subrecords:
       SCHD:

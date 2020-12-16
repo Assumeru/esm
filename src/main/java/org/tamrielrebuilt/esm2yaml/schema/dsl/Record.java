@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.tamrielrebuilt.esm2yaml.esm.EsmInputStream;
+import org.tamrielrebuilt.esm2yaml.esm.RecordUtil;
 import org.tamrielrebuilt.esm2yaml.schema.Context;
 
 public class Record implements RecordInstruction {
@@ -37,6 +38,11 @@ public class Record implements RecordInstruction {
 		for(RecordInstruction o : output) {
 			o.execute(context);
 		}
+	}
+
+	@Override
+	public String toString() {
+		return RecordUtil.appendTo(new StringBuilder("Record "), type).toString();
 	}
 
 	public static class Builder {

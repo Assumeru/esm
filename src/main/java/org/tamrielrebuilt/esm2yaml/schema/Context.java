@@ -76,4 +76,9 @@ public class Context {
 	public void onRecordEnd() throws IOException {
 		localVariables.clear();
 	}
+
+	@Override
+	public String toString() {
+		return "dir: " + directory + "\nglobals: " + globalVariables + "\nlocals: " + localVariables;
+	}
 }

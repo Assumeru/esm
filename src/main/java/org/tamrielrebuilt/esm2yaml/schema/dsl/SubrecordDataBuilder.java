@@ -24,6 +24,7 @@ public class SubrecordDataBuilder {
 	private Map<String, String> flags;
 	private Object outputValue;
 	private Integer typeLength;
+	private Integer numTypes;
 
 	SubrecordDataBuilder() {
 		instructions = new ArrayList<>();
@@ -51,6 +52,10 @@ public class SubrecordDataBuilder {
 
 	public void addInstruction(SubrecordInstruction instruction) {
 		instructions.add(instruction);
+	}
+
+	public void setArray(int numTypes) {
+		this.numTypes = numTypes;
 	}
 
 	DataHandler build() {
@@ -87,9 +92,12 @@ public class SubrecordDataBuilder {
 			throw new IllegalStateException("Unknown type " + type);
 		}
 		if(typeMapper != null && mappings != null && !mappings.isEmpty()) {
-			reader = createEnumReader(mappings, typeMapper, reader);
+			reader = createEnumReader(typeMapper, reader);
 		} else if(typeMapper != null && flags != null && !flags.isEmpty()) {
-			reader = createFlagReader(flags, typeMapper, reader);
+			reader = createFlagReader(typeMapper, reader);
+		}
+		if(numTypes != null) {
+			reader = createArrayReader(reader);
 		}
 		return new InstructionDataHandler(instructions, reader);
 	}
@@ -107,7 +115,7 @@ public class SubrecordDataBuilder {
 		};
 	}
 
-	private <T> ValueReader createEnumReader(Map<String, String> mappings, Function<String, T> mapper, ValueReader reader) {
+	private <T> ValueReader createEnumReader(Function<String, T> mapper, ValueReader reader) {
 		Map<T, String> parsed = parseNamed(mappings, mapper);
 		return input -> {
 			Object value = reader.read(input);
@@ -119,7 +127,7 @@ public class SubrecordDataBuilder {
 		};
 	}
 
-	private <T extends Number> ValueReader createFlagReader(Map<String, String> flags, Function<String, T> mapper, ValueReader reader) {
+	private <T extends Number> ValueReader createFlagReader(Function<String, T> mapper, ValueReader reader) {
 		Map<T, String> parsed = parseNamed(flags, mapper);
 		return input -> {
 			long value = ((Number) reader.read(input)).longValue();
@@ -137,6 +145,17 @@ public class SubrecordDataBuilder {
 				return null;
 			}
 			return values;
+		};
+	}
+
+	private ValueReader createArrayReader(ValueReader reader) {
+		int length = numTypes;
+		return input -> {
+			List<Object> array = new ArrayList<>(length);
+			for(int i = 0; i < length; i++) {
+				array.add(reader.read(input));
+			}
+			return array;
 		};
 	}
 
