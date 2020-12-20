@@ -872,6 +872,27 @@ records:
          -  concat:
             -  var: id
             - .yaml
+   DIAL:
+      subrecords:
+         NAME:
+            data:
+            -  type: string
+               name: id
+         DATA:
+            data:
+            -  type: byte
+               name: type
+               enum:
+                  0: topic
+                  1: voice
+                  2: greeting
+                  3: persuasion
+                  4: journal
+         DELE:
+            data:
+            -  type: marker
+               name: deleted
+               value: true
    SCPT:
       subrecords:
          SCHD:
