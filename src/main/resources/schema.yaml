@@ -893,6 +893,44 @@ records:
             -  type: marker
                name: deleted
                value: true
+   DOOR:
+      subrecords:
+         NAME:
+            data:
+            -  type: string
+               name: id
+         MODL:
+            data:
+            -  type: string
+               name: model
+         FNAM:
+            data:
+            -  type: string
+               name: name
+         SCRI:
+            data:
+            -  type: string
+               name: script
+         SNAM:
+            data:
+            -  type: string
+               name: openSound
+         ANAM:
+            data:
+            -  type: string
+               name: closeSound
+         DELE:
+            data:
+            -  type: marker
+               name: deleted
+               value: true
+      output:
+      -  yaml:
+         - doors
+         -  concat:
+            -  var: id
+            - .yaml
+   
    SCPT:
       subrecords:
          SCHD:
