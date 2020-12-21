@@ -1238,6 +1238,32 @@ records:
          -  concat:
             -  var: id
             - .yaml
+   GLOB:
+      subrecords:
+         NAME:
+            data:
+            -  type: string
+               name: id
+         FNAM:
+            data:
+            -  type: string
+               name: type
+         FLTV:
+            data:
+            -  type: float
+               name: value
+         DELE:
+            data:
+            -  type: marker
+               name: deleted
+               value: true
+      output:
+      -  yaml:
+         - globals
+         -  concat:
+            -  var: id
+            - .yaml
+   
    SCPT:
       subrecords:
          SCHD:
