@@ -1263,7 +1263,35 @@ records:
          -  concat:
             -  var: id
             - .yaml
-   
+   GMST:
+      subrecords:
+         NAME:
+            data:
+            -  type: string
+               name: id
+         INTV:
+            data:
+            -  type: int
+               name: intValue
+         FLTV:
+            data:
+            -  type: float
+               name: floatValue
+         STRV:
+            data:
+            -  type: string
+               name: stringValue
+         DELE:
+            data:
+            -  type: marker
+               name: deleted
+               value: true
+      output:
+      -  yaml:
+         - settings
+         -  concat:
+            -  var: id
+            - .yaml
    SCPT:
       subrecords:
          SCHD:
