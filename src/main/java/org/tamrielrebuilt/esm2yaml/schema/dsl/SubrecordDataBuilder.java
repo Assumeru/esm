@@ -25,6 +25,7 @@ public class SubrecordDataBuilder {
 	private Object outputValue;
 	private Integer typeLength;
 	private Integer numTypes;
+	private NestedDataBuilder data;
 
 	SubrecordDataBuilder() {
 		instructions = new ArrayList<>();
@@ -58,6 +59,11 @@ public class SubrecordDataBuilder {
 		this.numTypes = numTypes;
 	}
 
+	public NestedDataBuilder setData() {
+		data = new NestedDataBuilder();
+		return data;
+	}
+
 	DataHandler build() {
 		ValueReader reader = null;
 		Function<String, Number> typeMapper = null;
@@ -87,6 +93,8 @@ public class SubrecordDataBuilder {
 			reader = ValueReader.HEX_READER;
 		} else if("marker".equals(type)) {
 			reader = createMarkerReader(outputValue);
+		} else if("array".equals(type)) {
+			return createArrayHandler();
 		}
 		if(reader == null) {
 			throw new IllegalStateException("Unknown type " + type);
@@ -178,6 +186,16 @@ public class SubrecordDataBuilder {
 		};
 	}
 
+	private DataHandler createArrayHandler() {
+		int length = numTypes;
+		DataHandler handler = data.build();
+		return (input, context) -> {
+			for(int i = 0; i < length; i++) {
+				handler.handle(input, context);
+			}
+		};
+	}
+
 	private static class InstructionDataHandler implements DataHandler {
 		private final List<SubrecordInstruction> instructions;
 		private final ValueReader reader;
@@ -193,6 +211,32 @@ public class SubrecordDataBuilder {
 			for(SubrecordInstruction instruction : instructions) {
 				instruction.execute(context, value);
 			}
+		}
+	}
+
+	public static class NestedDataBuilder {
+		private final List<SubrecordDataBuilder> builders;
+
+		NestedDataBuilder() {
+			this.builders = new ArrayList<>();
+		}
+
+		public SubrecordDataBuilder addData() {
+			SubrecordDataBuilder builder = new SubrecordDataBuilder();
+			builders.add(builder);
+			return builder;
+		}
+
+		DataHandler build() {
+			List<DataHandler> handlers = new ArrayList<>(builders.size());
+			for(SubrecordDataBuilder builder : builders) {
+				handlers.add(builder.build());
+			}
+			return (input, context) -> {
+				for(DataHandler handler : handlers) {
+					handler.handle(input, context);
+				}
+			};
 		}
 	}
 }

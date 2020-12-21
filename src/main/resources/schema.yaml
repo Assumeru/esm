@@ -111,7 +111,7 @@ defs:
       71: Cure Corprus Disease
       72: Cure Poison
       73: Cure Paralyzation
-      74: Restore Attribute 
+      74: Restore Attribute
       75: Restore Health
       76: Restore Spell Points
       77: Restore Fatigue
@@ -1153,7 +1153,91 @@ records:
          -  concat:
             -  var: id
             - .yaml
-      
+   FACT:
+      subrecords:
+         NAME:
+            data:
+            -  type: string
+               name: id
+         FNAM:
+            data:
+            -  type: string
+               name: name
+         RNAM:
+            data:
+            -  type: string
+               output:
+               -  push: rankNames
+               -  set:
+                  - rankNames
+                  - name
+         FADT:
+            data:
+            -  type: int
+               array: 2
+               enum: attributes
+               name: attributes
+            -  type: array
+               array: 10
+               data:
+               -  type: int
+                  output:
+                  -  push: ranks
+                  -  set:
+                     - ranks
+                     - attribute1
+               -  type: int
+                  output:
+                  -  set:
+                     - ranks
+                     - attribute2
+               -  type: int
+                  output:
+                  -  set:
+                     - ranks
+                     - primarySkill
+               -  type: int
+                  output:
+                  -  set:
+                     - ranks
+                     - favoredSkill
+               -  type: int
+                  output:
+                  -  set:
+                     - ranks
+                     - reaction
+            -  type: int
+               array: 7
+               enum: skills
+               name: skills
+            -  type: int
+               name: hidden
+         ANAM:
+            data:
+            -  type: string
+               output:
+               -  push: reactions
+               -  set:
+                  - reactions
+                  - id
+         INTV:
+            data:
+            -  type: int
+               output:
+               -  set:
+                  - reactions
+                  - reaction
+         DELE:
+            data:
+            -  type: marker
+               name: deleted
+               value: true
+      output:
+      -  yaml:
+         - factions
+         -  concat:
+            -  var: id
+            - .yaml
    SCPT:
       subrecords:
          SCHD:

@@ -17,6 +17,7 @@ import org.tamrielrebuilt.esm2yaml.schema.dsl.RecordOutput.Type;
 import org.tamrielrebuilt.esm2yaml.schema.dsl.SetInstruction;
 import org.tamrielrebuilt.esm2yaml.schema.dsl.Subrecord;
 import org.tamrielrebuilt.esm2yaml.schema.dsl.SubrecordDataBuilder;
+import org.tamrielrebuilt.esm2yaml.schema.dsl.SubrecordDataBuilder.NestedDataBuilder;
 import org.tamrielrebuilt.esm2yaml.schema.dsl.VariableField;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -113,44 +114,53 @@ public class SchemaParser implements Closeable {
 	private void parseSubrecordData(Subrecord.Builder subrecord) throws IOException {
 		parseArray(t -> {
 			SubrecordDataBuilder builder = subrecord.addData();
-			parseObject(key -> {
-				if("type".equals(key)) {
-					builder.setType(parser.nextTextValue());
-				} else if("enum".equals(key)) {
-					builder.setEnum(parseStringMap());
-				} else if("output".equals(key)) {
-					parseArray(t2 -> {
-						parseObject(outputKey -> {
-							if("push".equals(outputKey)) {
-								VariableField name = parseVariableField();
-								builder.addInstruction(new PushInstruction(name, true));
-							} else if("set".equals(outputKey)) {
-								VariableField name = parseVariableField();
-								builder.addInstruction(new SetInstruction(name, true));
-							} else {
-								throw new IllegalStateException("Unexpected data output key " + key);
-							}
-						}, false);
-					});
-				} else if("length".equals(key)) {
-					expect(JsonToken.VALUE_NUMBER_INT);
-					builder.setLength(parser.getIntValue());
-				} else if("name".equals(key)) {
-					VariableField name = parseVariableField();
-					builder.addInstruction(new SetInstruction(name, true));
-				} else if("value".equals(key)) {
-					parser.nextValue();
-					builder.setOutputValue(parser.getCurrentValue());
-				} else if("flags".equals(key)) {
-					builder.setFlags(parseStringMap());
-				} else if("array".equals(key)) {
-					expect(JsonToken.VALUE_NUMBER_INT);
-					builder.setArray(parser.getIntValue());
-				} else {
-					throw new IllegalStateException("Unexpected data key " + key);
-				}
-			}, false);
+			parseSubrecordData(builder);
 		});
+	}
+
+	private void parseSubrecordData(SubrecordDataBuilder builder) throws IOException {
+		parseObject(key -> {
+			if("type".equals(key)) {
+				builder.setType(parser.nextTextValue());
+			} else if("enum".equals(key)) {
+				builder.setEnum(parseStringMap());
+			} else if("output".equals(key)) {
+				parseArray(t2 -> {
+					parseObject(outputKey -> {
+						if("push".equals(outputKey)) {
+							VariableField name = parseVariableField();
+							builder.addInstruction(new PushInstruction(name, true));
+						} else if("set".equals(outputKey)) {
+							VariableField name = parseVariableField();
+							builder.addInstruction(new SetInstruction(name, true));
+						} else {
+							throw new IllegalStateException("Unexpected data output key " + key);
+						}
+					}, false);
+				});
+			} else if("length".equals(key)) {
+				expect(JsonToken.VALUE_NUMBER_INT);
+				builder.setLength(parser.getIntValue());
+			} else if("name".equals(key)) {
+				VariableField name = parseVariableField();
+				builder.addInstruction(new SetInstruction(name, true));
+			} else if("value".equals(key)) {
+				parser.nextValue();
+				builder.setOutputValue(parser.getCurrentValue());
+			} else if("flags".equals(key)) {
+				builder.setFlags(parseStringMap());
+			} else if("array".equals(key)) {
+				expect(JsonToken.VALUE_NUMBER_INT);
+				builder.setArray(parser.getIntValue());
+			} else if("data".equals(key)) {
+				NestedDataBuilder dataBuilder = builder.setData();
+				parseArray(t -> {
+					parseSubrecordData(dataBuilder.addData());
+				});
+			} else {
+				throw new IllegalStateException("Unexpected data key " + key);
+			}
+		}, false);
 	}
 
 	private void parseRecordOutput(RecordInstruction.Builder builder) throws IOException {
