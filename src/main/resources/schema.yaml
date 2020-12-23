@@ -1401,6 +1401,57 @@ records:
             -  type: marker
                name: deleted
                value: true
+   INGR:
+      subrecords:
+         NAME:
+            data:
+            -  type: string
+               name: id
+         MODL:
+            data:
+            -  type: string
+               name: model
+         FNAM:
+            data:
+            -  type: string
+               name: name
+         IRDT:
+            data:
+            -  type: float
+               name: weight
+            -  type: int
+               name: value
+            -  type: int
+               name: effects
+               enum: effects
+               array: 4
+            -  type: int
+               name: skills
+               enum: skills
+               array: 4
+            -  type: int
+               name: attributes
+               enum: attributes
+               array: 4
+         SCRI:
+            data:
+            -  type: string
+               name: script
+         ITEX:
+            data:
+            -  type: string
+               name: icon
+         DELE:
+            data:
+            -  type: marker
+               name: deleted
+               value: true
+      output:
+      -  yaml:
+         - ingredients
+         -  concat:
+            -  var: id
+            - .yaml
    SCPT:
       subrecords:
          SCHD:
