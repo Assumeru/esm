@@ -1292,6 +1292,115 @@ records:
          -  concat:
             -  var: id
             - .yaml
+   INFO:
+      subrecords:
+         INAM:
+            data:
+            -  type: string
+               name: id
+         PNAM:
+            data:
+            -  type: string
+               name: previous
+         NNAM:
+            data:
+            -  type: string
+               name: next
+         DATA:
+            data:
+            -  type: int
+               name: padding1
+            -  type: int
+               name: disposition
+            -  type: byte
+               name: rank
+            -  type: byte
+               name: gender
+               enum:
+                  0: male
+                  1: female
+            -  type: byte
+               name: pcRank
+            -  type: byte
+               name: padding2
+         ONAM:
+            data:
+            -  type: string
+               name: actor
+         RNAM:
+            data:
+            -  type: string
+               name: race
+         CNAM:
+            data:
+            -  type: string
+               name: class
+         FNAM:
+            data:
+            -  type: string
+               name: faction
+         ANAM:
+            data:
+            -  type: string
+               name: cell
+         DNAM:
+            data:
+            -  type: string
+               name: pcFaction
+         SNAM:
+            data:
+            -  type: string
+               name: sound
+         NAME:
+            data:
+            -  type: string
+               name: response
+         SCVR:
+            data:
+            -  type: string
+               output:
+               -  push: filters
+               -  set:
+                  - filters
+                  - rule
+         INTV:
+            data:
+            -  type: int
+               output:
+               -  set:
+                  - filters
+                  - intValue
+         FLTV:
+            data:
+            -  type: float
+               output:
+               -  set:
+                  - filters
+                  - floatValue
+         BNAM:
+            data:
+            -  type: string
+               name: script
+         QSTN:
+            data:
+            -  type: marker
+               name: questName
+               value: true
+         QSTF:
+            data:
+            -  type: marker
+               name: questFinished
+               value: true
+         QSTR:
+            data:
+            -  type: marker
+               name: questRestart
+               value: true
+         DELE:
+            data:
+            -  type: marker
+               name: deleted
+               value: true
    SCPT:
       subrecords:
          SCHD:
