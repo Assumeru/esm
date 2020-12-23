@@ -1629,6 +1629,49 @@ records:
          -  concat:
             -  var: id
             - .yaml
+   LOCK:
+      subrecords:
+         NAME:
+            data:
+            -  type: string
+               name: id
+         MODL:
+            data:
+            -  type: string
+               name: model
+         FNAM:
+            data:
+            -  type: string
+               name: name
+         LKDT:
+            data:
+            -  type: float
+               name: weight
+            -  type: int
+               name: value
+            -  type: float
+               name: quality
+            -  type: int
+               name: uses
+         SCRI:
+            data:
+            -  type: string
+               name: script
+         ITEX:
+            data:
+            -  type: string
+               name: icon
+         DELE:
+            data:
+            -  type: marker
+               name: deleted
+               value: true
+      output:
+      -  yaml:
+         - lockpicks
+         -  concat:
+            -  var: id
+            - .yaml
    SCPT:
       subrecords:
          SCHD:
