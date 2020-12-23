@@ -1782,6 +1782,47 @@ records:
          -  concat:
             -  var: effect
             - .yaml
+   MISC:
+      subrecords:
+         NAME:
+            data:
+            -  type: string
+               name: id
+         MODL:
+            data:
+            -  type: string
+               name: model
+         FNAM:
+            data:
+            -  type: string
+               name: name
+         MCDT:
+            data:
+            -  type: float
+               name: weight
+            -  type: int
+               name: value
+            -  type: int
+               name: key
+         SCRI:
+            data:
+            -  type: string
+               name: script
+         ITEX:
+            data:
+            -  type: string
+               name: icon
+         DELE:
+            data:
+            -  type: marker
+               name: deleted
+               value: true
+      output:
+      -  yaml:
+         - miscellaneous
+         -  concat:
+            -  var: id
+            - .yaml
             
    SCPT:
       subrecords:
