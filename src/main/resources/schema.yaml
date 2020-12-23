@@ -1489,7 +1489,85 @@ records:
             data:
             -  type: binary
                name: textures
-            
+   LEVC:
+      subrecords:
+         NAME:
+            data:
+            -  type: string
+               name: id
+         DATA:
+            data:
+            -  type: int
+               name: flags
+               flags:
+                  1: all levels
+         NNAM:
+            data:
+            -  type: byte
+               name: chanceNone
+         INDX:
+            data:
+            -  type: int
+               name: length
+         CNAM:
+            data:
+            -  type: string
+               output:
+               -  push: creatures
+               -  set:
+                  - creatures
+                  - id
+         DELE:
+            data:
+            -  type: marker
+               name: deleted
+               value: true
+      output:
+      -  yaml:
+         - leveled creatures
+         -  concat:
+            -  var: id
+            - .yaml
+   LEVI:
+      subrecords:
+         NAME:
+            data:
+            -  type: string
+               name: id
+         DATA:
+            data:
+            -  type: int
+               name: flags
+               flags:
+                  1: each
+                  2: all levels
+         NNAM:
+            data:
+            -  type: byte
+               name: chanceNone
+         INDX:
+            data:
+            -  type: int
+               name: length
+         INAM:
+            data:
+            -  type: string
+               output:
+               -  push: items
+               -  set:
+                  - items
+                  - id
+         DELE:
+            data:
+            -  type: marker
+               name: deleted
+               value: true
+      output:
+      -  yaml:
+         - leveled items
+         -  concat:
+            -  var: id
+            - .yaml
    SCPT:
       subrecords:
          SCHD:
