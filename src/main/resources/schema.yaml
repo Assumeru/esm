@@ -174,6 +174,10 @@ defs:
       134: Summon Centurion Sphere
       135: Sun Damage
       136: Stunted Magicka
+      137: Summon Fabricant
+      138: Call Wolf
+      139: Call Bear
+      140: Summon Bonewolf
    skills:
       0: block
       1: armorer,
@@ -1697,6 +1701,88 @@ records:
          -  concat:
             -  var: id
             - .yaml
+   MGEF:
+      subrecords:
+         INDX:
+            data:
+            -  type: int
+               name: effect
+               enum: effects
+         MEDT:
+            data:
+            -  type: int
+               name: school
+            -  type: float
+               name: baseCost
+            -  type: int
+               name: flags
+               flags:
+                  512: spellmaking
+                  1024: enchanting
+                  2048: negative light
+            -  type: int
+               name: glowRed
+            -  type: int
+               name: glowGreen
+            -  type: int
+               name: glowBlue
+            -  type: float
+               name: size
+            -  type: float
+               name: speed
+            -  type: float
+               name: sizeCap
+         ITEX:
+            data:
+            -  type: string
+               name: icon
+         PTEX:
+            data:
+            -  type: string
+               name: particle
+         BSND:
+            data:
+            -  type: string
+               name: boltSound
+         CSND:
+            data:
+            -  type: string
+               name: castSound
+         HSND:
+            data:
+            -  type: string
+               name: hitSound
+         ASND:
+            data:
+            -  type: string
+               name: areaSound
+         CVFX:
+            data:
+            -  type: string
+               name: castEffect
+         BVFX:
+            data:
+            -  type: string
+               name: boltEffect
+         HVFX:
+            data:
+            -  type: string
+               name: hitEffect
+         AVFX:
+            data:
+            -  type: string
+               name: areaEffect
+         DESC:
+            data:
+            -  type: string
+               name: description
+      output:
+      -  yaml:
+         - magic
+         -  concat:
+            -  var: effect
+            - .yaml
+            
    SCPT:
       subrecords:
          SCHD:
