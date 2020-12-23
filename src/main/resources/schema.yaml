@@ -1672,6 +1672,31 @@ records:
          -  concat:
             -  var: id
             - .yaml
+   LTEX:
+      subrecords:
+         NAME:
+            data:
+            -  type: string
+               name: id
+         INTV:
+            data:
+            -  type: int
+               name: index
+         DATA:
+            data:
+            -  type: string
+               name: texture
+         DELE:
+            data:
+            -  type: marker
+               name: deleted
+               value: true
+      output:
+      -  yaml:
+         - land textures
+         -  concat:
+            -  var: id
+            - .yaml
    SCPT:
       subrecords:
          SCHD:
