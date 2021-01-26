@@ -1,0 +1,64 @@
+CELL:
+   subrecords:
+      NAME:
+         data:
+         -  type: string
+            name: name
+      DATA:
+         data:
+         -  type: int
+            name: flags
+            flags:
+               1: interior
+               2: has water
+               4: illegal to sleep
+               128: behave like exterior
+         -  type: int
+            name: x
+         -  type: int
+            name: y
+      DELE:
+         data:
+         -  type: marker
+            name: deleted
+            value: true
+      INTV:
+         data:
+         -  type: int
+            name: waterlevel
+      WHGT:
+         data:
+         -  type: float
+            name: waterlevel2
+      AMBI:
+         data:
+         -  type: int
+            name: ambientColor
+         -  type: int
+            name: sunColor
+         -  type: int
+            name: fogColor
+         -  type: float
+            name: fogDensity
+      RGNN:
+         data:
+         -  type: string
+            name: region
+      NAM5:
+         data:
+         -  type: int
+            name: mapColor
+      NAM0:
+         data:
+         -  type: int
+            name: refCounter
+   output:
+   -  yaml:
+      - cells
+      -  concat:
+         -  var: x
+         - ", "
+         -  var: y
+         - ", "
+         -  var: id
+      - metadata.yaml
